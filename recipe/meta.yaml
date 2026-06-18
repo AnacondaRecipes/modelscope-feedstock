@@ -15,6 +15,7 @@ build:
   skip: true  # [py<310]
   entry_points:
     - modelscope = modelscope.cli.cli:run_cmd
+    - ms = modelscope.cli.cli:run_cmd
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
 
 requirements:
@@ -41,6 +42,7 @@ test:
   commands:
     - pip check
     - modelscope --help
+    - ms --help
 
 about:
   home: https://github.com/modelscope/modelscope
@@ -59,4 +61,5 @@ about:
 
 extra:
   recipe-maintainers:
+    - shermansiu
     - xkong-anaconda
