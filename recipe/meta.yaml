@@ -6,51 +6,60 @@ package:
   version: {{ version }}
 
 source:
-  # The one on PyPI doesn't include setup.py.
+  # PyPI sdist omits setup.py; build from the GitHub release tarball
   url: https://github.com/{{ name }}/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
   sha256: 1abcf3ca791fb6b10b3d0b5cd89ab2cbe408e6687b7425c4293c1d16d84572ae
 
 build:
   number: 0
-  noarch: python
+  skip: true  # [py<310]
   entry_points:
     - modelscope = modelscope.cli.cli:run_cmd
-  script: |
-    {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+    - ms = modelscope.cli.cli:run_cmd
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
 
 requirements:
   host:
-    - python {{ python_min }}
+    - python
     - pip
     - setuptools
-    - filelock
-    - requests >=2.25
-    - tqdm >=4.64.0
   run:
-    # We just include hub by default
-    - python >={{ python_min }}
-    - filelock  # Prevent import error
+    # Hub-only baseline; ModelScope's task-specific extras (cv/nlp/audio/multi-modal/etc.) are out of scope for this feedstock
+    - python
+    - filelock
+    - packaging
     - requests >=2.25
+    - setuptools
     - tqdm >=4.64.0
     - urllib3 >=1.26
 
 test:
   imports:
     - modelscope
+    - modelscope.hub
+  requires:
+    - pip
   commands:
     - pip check
     - modelscope --help
-  requires:
-    - python {{ python_min }}
-    - pip
+    - ms --help
 
 about:
   home: https://github.com/modelscope/modelscope
-  summary: 'ModelScope: bring the notion of Model-as-a-Service to life.'
+  summary: 'ModelScope: bring the notion of Model-as-a-Service to life'
+  description: |
+    ModelScope is a Python library that lets users interact with the
+    ModelScope Hub for downloading models, datasets, and managing
+    inference workflows. This package ships the hub-only baseline;
+    task-specific extras (cv/nlp/audio/multi-modal) are not packaged.
+  dev_url: https://github.com/modelscope/modelscope
+  doc_url: https://modelscope.cn/docs
   license: Apache-2.0
+  license_family: APACHE
   license_file:
     - LICENSE
 
 extra:
   recipe-maintainers:
     - shermansiu
+    - xkong-anaconda
